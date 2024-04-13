@@ -1,6 +1,7 @@
 # AP News Web Scraper
 This is a demonstration of the usage of an LLM API, Gemini API, using the web scraper that this is branched off of.
 There are two modules that feed into run.py; GAI contains gemini AI related functions, such as sending the prompt and making the article readable by the AI.
+This version now has more detailed test cases.
 
 This branch also contains an updated version of the python environment used, as the LLM API requires a package to be imported. Be sure to use this version of the environment (the requirements.yml file in this branch).
 ## Information:
@@ -15,6 +16,7 @@ This branch also contains an updated version of the python environment used, as 
 
 -Data contains two different folders: raw and processed. Raw is the original version of the data format, with there being a title and the article body. Processed contains the gemini-generated summary of each of the articles.
 
+-Test cases and their implementation can be found in the "Issues" tab above. Specifically, they're all listed in the "TEST CASES IMPLEMENTATION" thread. 
 
 ## API Key
 An extremely important "key" to this project is the necessity of an API key to use this program. The API key is an access token to access their API. It is relatively simply to do this.
