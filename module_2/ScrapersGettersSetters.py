@@ -96,8 +96,13 @@ class WriteTitle(InfoWriters):
     
 class GetArticle(InfoGetters):
     def getInfo(self, soup) -> str:
-        # gets actual article text from <p> tags, find_all() puts it into an array
-        body = soup.find_all('p')
+        try:
+            # gets actual article text from <p> tags, find_all() puts it into an array
+            body = soup.find_all('p')
+        except:
+            # sets body content to empty string then outputs error message/warning
+            body = ""
+            print("Body unable to be scraped.")
         return body
 
 class WriteArticle(InfoWriters):
