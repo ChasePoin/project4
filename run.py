@@ -71,7 +71,8 @@ def main():
                     model = GAI.configureAI()
                     # sets up the AI, returns which model is being used
                 except:
-                    print(f"Failed to set up the AI for article {articleNumber}")
+                    print(f"Failed to set up the AI.")
+                    exit()
     
                 readableArticle = makeReadableForAI.makeArticleReadable(APscraper.body, articleNumber)
                 # makes the article a giant string instead of an array; the AI does NOT like the array...
