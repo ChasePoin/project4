@@ -78,10 +78,15 @@ class GetURLSTextFile(URLGrabber):
 class GetTitle(InfoGetters):
     def getInfo(self, soup) -> str:
         # gets title from <h1> tags, makes it pretty, encoding it into ascii and decoding it back to a string in order to remove
-        # unicode characters from appearing as "question marks," returns the title  
-        title = soup.find('h1', class_='Page-headline').text
-        encodedTitle = title.encode('ascii', 'ignore')
-        titleText = encodedTitle.decode()
+        # unicode characters from appearing as "question marks," returns the title
+        try:
+            title = soup.find('h1', class_='Page-headline').text
+            encodedTitle = title.encode('ascii', 'ignore')
+            titleText = encodedTitle.decode()
+        except:
+            # sets title to an empty string and outputs warning
+            titleText = ""
+            print("Title text unable to be scraped.")
         return titleText
 
 class WriteTitle(InfoWriters):
