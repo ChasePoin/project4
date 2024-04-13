@@ -40,61 +40,67 @@ def main():
         summaryFileName = summaryFileName.replace(" ", "_")
 
         # RAW:
-        if (not exists("./Data/raw/" + rawFileName)):
-            # handles writing raw data
-            # RAW == ORIGINAL FORM OF WRITING
-            rawFileToOutput = open("./Data/raw/" + rawFileName, "x")
-            try:
-                titleWriter.writeInfo(APscraper.titleText, rawFileToOutput, articleNumber)
-                # writes the title to the file
-            except:
-                print(f"Failed to write title for article {articleNumber}.")
-            
-            try:
-                articleWriter.writeInfo(APscraper.body, rawFileToOutput, articleNumber)
-                # write article body to file
-            except:
-                print(f"Failed to write Article data for RAW, article {articleNumber}")
+        if (APscraper.titleText != "" or APscraper.body != ""):
+            if (not exists("./Data/raw/" + rawFileName)):
+                # handles writing raw data
+                # RAW == ORIGINAL FORM OF WRITING
+                rawFileToOutput = open("./Data/raw/" + rawFileName, "x")
+                try:
+                    titleWriter.writeInfo(APscraper.titleText, rawFileToOutput, articleNumber)
+                    # writes the title to the file
+                except:
+                    print(f"Failed to write title for article {articleNumber}.")
+                
+                try:
+                    articleWriter.writeInfo(APscraper.body, rawFileToOutput, articleNumber)
+                    # write article body to file
+                except:
+                    print(f"Failed to write Article data for RAW, article {articleNumber}")
+    
+                print(f"RAW Article {articleNumber} file created successfully.")
+            else:
+                print(f"RAW Article {articleNumber} file already exists.")
 
-            print(f"RAW Article {articleNumber} file created successfully.")
+            # SUMMARY:
+            if (not exists("./Data/processed/" + summaryFileName)):
+                # handles writing processed data
+                ### PROCESSED IS NOW THE SUMMARIES ###
+                fileToOutput = open("./Data/processed/" + summaryFileName, "x")
+    
+                try:
+                    model = GAI.configureAI()
+                    # sets up the AI, returns which model is being used
+                except:
+                    print(f"Failed to set up the AI for article {articleNumber}")
+    
+                readableArticle = makeReadableForAI.makeArticleReadable(APscraper.body, articleNumber)
+                # makes the article a giant string instead of an array; the AI does NOT like the array...
+                readableTitle = makeReadableForAI.makeTitleReadable(APscraper.titleText, articleNumber)
+                # makes the title properly formatted for the AI to read
+                
+                try:
+                    aiSummary = GAI.sendAIprompt(model, readableArticle, readableTitle)
+                    # sends the AI the prompt with the newly readable (converted to large strings) body and title and model of gemini being used
+                except:
+                    print(f"Failed to send the AI the prompt for article {articleNumber}")
+    
+                try:
+                    summaryWriter.writeInfo(textwrap.fill(aiSummary.text, 100), fileToOutput, articleNumber)
+                    # writes gemini's returned summary text to file
+                except:
+                    print(f"Failed to write the summary for article {articleNumber}")
+    
+                # the try except blocks do not fail the program but instead just fail on a per article basis
+                print(f"PROCESSED Article {articleNumber} file created successfully.")
+                fileToOutput.close()
+            else:
+                print(f"PROCESSED Article {articleNumber} file already exists.")
         else:
-            print(f"RAW Article {articleNumber} file already exists.")
-
-        # SUMMARY:
-        if (not exists("./Data/processed/" + summaryFileName)):
-            # handles writing processed data
-            ### PROCESSED IS NOW THE SUMMARIES ###
-            fileToOutput = open("./Data/processed/" + summaryFileName, "x")
-
-            try:
-                model = GAI.configureAI()
-                # sets up the AI, returns which model is being used
-            except:
-                print(f"Failed to set up the AI for article {articleNumber}")
-
-            readableArticle = makeReadableForAI.makeArticleReadable(APscraper.body, articleNumber)
-            # makes the article a giant string instead of an array; the AI does NOT like the array...
-            readableTitle = makeReadableForAI.makeTitleReadable(APscraper.titleText, articleNumber)
-            # makes the title properly formatted for the AI to read
-            
-            try:
-                aiSummary = GAI.sendAIprompt(model, readableArticle, readableTitle)
-                # sends the AI the prompt with the newly readable (converted to large strings) body and title and model of gemini being used
-            except:
-                print(f"Failed to send the AI the prompt for article {articleNumber}")
-
-            try:
-                summaryWriter.writeInfo(textwrap.fill(aiSummary.text, 100), fileToOutput, articleNumber)
-                # writes gemini's returned summary text to file
-            except:
-                print(f"Failed to write the summary for article {articleNumber}")
-
-            # the try except blocks do not fail the program but instead just fail on a per article basis
-            print(f"PROCESSED Article {articleNumber} file created successfully.")
-            fileToOutput.close()
-        else:
-            print(f"PROCESSED Article {articleNumber} file already exists.")
-
+            # output a message depending on which error occured
+            if(APscraper.body == ""):
+                print(f"Body unable to be found for {articleNumber}. Going to next URL.")
+            if(APscraper.titleText == ""):
+                print(f"Title unable to be found for {articleNumber}. Going to next URL.")
         articleNumber = articleNumber + 1
 
 if __name__ == "__main__":
